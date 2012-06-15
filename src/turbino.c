@@ -321,6 +321,8 @@ main (int argc, char *argv[])
 
 		if (!strcmp(dp[c]->type, "html")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
+		} else if (!strcmp(dp[c]->type, "css")) {
+			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "jpg")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "jpeg")) {

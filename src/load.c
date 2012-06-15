@@ -20,6 +20,7 @@ load(char *file)
 
 	d->data = NULL;
 	d->len = 0;
+	d->key = NULL;
 
 	fd = open(file, O_RDONLY);
 	if (fd < 0) {
@@ -43,6 +44,11 @@ load(char *file)
 	}
 
 	close(fd);
+
+	if (d->len > 0) {
+		d->key = malloc(strlen(file) + 1);
+		sprintf(d->key, "%s", file);
+	}
 
 	printf("Loaded %d bytes of data\n", d->len);
 

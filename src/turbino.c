@@ -32,11 +32,16 @@ main (int argc, char *argv[])
    fd_set        master_set, working_set;
 	//void *img;
 	void *resp;
-	struct data *dp;
+	//struct data *dp;
+	struct data **dp;
+	unsigned char c, j;
+	char res[256];
 
-	dp = load("dummy.jpeg");
+	dp = malloc(sizeof(struct data *));
+	dp[0] = load("dummy.jpeg");
 
-	printf("dp len: %d\n", dp->len);
+	printf("dp len: %d\n", dp[0]->len);
+	printf("dp key: \"%s\"\n", dp[0]->key);
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -269,6 +274,17 @@ main (int argc, char *argv[])
                   /**********************************************/
                   /* Echo the data back to the client           */
                   /**********************************************/
+
+		j = 0;
+		for (c = 5 ; buffer[c] != 32 ; c++) {
+
+			res[j++] = buffer[c];
+		}
+		res[j] = '\0';
+
+		printf("res: \"%s\"\n", res);
+
+
 		//sprintf(buffer, "%s%zd\r\n\r\n%s", http_resp, strlen(html_index), html_index);
 		sprintf(buffer, "%s5618\r\n\r\n", http_resp);
 
@@ -277,7 +293,7 @@ main (int argc, char *argv[])
 		memcpy(resp, buffer, strlen(buffer));
 
 		//memcpy(resp+strlen(buffer), img, 5618);
-		memcpy(resp+strlen(buffer), dp->data, 5618);
+		memcpy(resp+strlen(buffer), dp[0]->data, 5618);
 
 
                   //rc = send(i, buffer, strlen(buffer), 0);

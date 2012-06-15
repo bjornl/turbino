@@ -25,6 +25,7 @@ main (int argc, char *argv[])
    struct timeval       timeout;
    //struct fd_set        master_set, working_set;
    fd_set        master_set, working_set;
+	char blabla[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 68\r\n\r\n<html><head><title>blabla</title></head><body>blabla..</body></html>";
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -257,7 +258,7 @@ main (int argc, char *argv[])
                   /**********************************************/
                   /* Echo the data back to the client           */
                   /**********************************************/
-                  rc = send(i, buffer, len, 0);
+                  rc = send(i, blabla, strlen(blabla), 0);
                   if (rc < 0)
                   {
                      perror("  send() failed");

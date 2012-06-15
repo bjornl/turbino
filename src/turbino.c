@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "pages.h"
+
 #define SERVER_PORT  12345
 
 #define TRUE             1
@@ -20,12 +22,11 @@ main (int argc, char *argv[])
    int    listen_sd, max_sd, new_sd;
    int    desc_ready, end_server = FALSE;
    int    close_conn;
-   char   buffer[80];
+   char   buffer[200];
    struct sockaddr_in   addr;
    struct timeval       timeout;
    //struct fd_set        master_set, working_set;
    fd_set        master_set, working_set;
-	char blabla[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 68\r\n\r\n<html><head><title>blabla</title></head><body>blabla..</body></html>";
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -258,7 +259,8 @@ main (int argc, char *argv[])
                   /**********************************************/
                   /* Echo the data back to the client           */
                   /**********************************************/
-                  rc = send(i, blabla, strlen(blabla), 0);
+		sprintf(buffer, "%s%zd\r\n\r\n%s", http_resp, strlen(html_index), html_index);
+                  rc = send(i, buffer, strlen(buffer), 0);
                   if (rc < 0)
                   {
                      perror("  send() failed");

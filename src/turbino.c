@@ -8,12 +8,15 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "load.h"
 #include "pages.h"
 
 #define SERVER_PORT  12345
 
 #define TRUE             1
 #define FALSE            0
+
+struct data * load (char *);
 
 int
 main (int argc, char *argv[])
@@ -22,11 +25,18 @@ main (int argc, char *argv[])
    int    listen_sd, max_sd, new_sd;
    int    desc_ready, end_server = FALSE;
    int    close_conn;
-   char   buffer[200];
+   char   buffer[10000];
    struct sockaddr_in   addr;
    struct timeval       timeout;
    //struct fd_set        master_set, working_set;
    fd_set        master_set, working_set;
+	//void *img;
+	void *resp;
+	struct data *dp;
+
+	dp = load("dummy.jpeg");
+
+	printf("dp len: %d\n", dp->len);
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -259,14 +269,27 @@ main (int argc, char *argv[])
                   /**********************************************/
                   /* Echo the data back to the client           */
                   /**********************************************/
-		sprintf(buffer, "%s%zd\r\n\r\n%s", http_resp, strlen(html_index), html_index);
-                  rc = send(i, buffer, strlen(buffer), 0);
+		//sprintf(buffer, "%s%zd\r\n\r\n%s", http_resp, strlen(html_index), html_index);
+		sprintf(buffer, "%s5618\r\n\r\n", http_resp);
+
+		resp = malloc(strlen(buffer) + 5618);
+
+		memcpy(resp, buffer, strlen(buffer));
+
+		//memcpy(resp+strlen(buffer), img, 5618);
+		memcpy(resp+strlen(buffer), dp->data, 5618);
+
+
+                  //rc = send(i, buffer, strlen(buffer), 0);
+                  rc = send(i, resp, strlen(buffer)+5618, 0);
                   if (rc < 0)
                   {
                      perror("  send() failed");
                      close_conn = TRUE;
                      break;
-                  }
+                  } else {
+			printf("Sent %d bytes", rc);
+		}
 
 		break;
                } while (TRUE);

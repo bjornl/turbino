@@ -13,10 +13,10 @@ load(char *file)
 {
 	int fd, i, j = 0;
 	ssize_t len = 1;
-	char buf[1400];
+	char buf[100000];
 	//void *data;
 	//unsigned int dlen = 0;
-	struct data *d = malloc(sizeof(struct data *));
+	struct data *d = malloc(sizeof(struct data));
 
 	d->data = NULL;
 	d->len = 0;
@@ -29,7 +29,7 @@ load(char *file)
 	}
 
 	while (len) {
-		len = read(fd, buf, 1400);
+		len = read(fd, buf, 100000);
 		printf("read %zd bytes from fd\n", len);
 		if (!len) {
 			break;

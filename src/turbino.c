@@ -7,6 +7,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include "load.h"
 #include "http.h"
@@ -36,16 +38,24 @@ main (int argc, char *argv[])
 	struct data **dp;
 	unsigned char c, j;
 	char res[256];
-	unsigned int dpc;
+	unsigned int dpc = 0;
+	DIR *dir;
+	struct dirent *de;
 
-	dp = malloc(sizeof(struct data *) * 6);
-	dp[0] = load("index.html");
-	dp[1] = load("dummy.jpeg");
-	dp[2] = load("openbsd.jpg");
-	dp[3] = load("index2.html");
-	dp[4] = load("c228da4b01c870892e560b42320704bd21c9c187.jpg");
-	dp[5] = load("favicon.ico");
-	dpc = 6;
+	dir = opendir(".");
+	do {
+		de = readdir(dir);
+
+		if (de) {
+			if (de->d_type == DT_REG) {
+				printf("Loading file \"%s\" into dp[%d]\n", de->d_name, dpc);
+				dp = realloc(dp, sizeof(struct data *) * (dpc+1));
+				dp[dpc] = load(de->d_name);
+				dpc++;
+			}
+		}
+	} while (de);
+	closedir(dir);
 
 	printf("dp[0] len: %d\n", dp[0]->len);
 	printf("dp[0] key: \"%s\"\n", dp[0]->key);
@@ -297,17 +307,16 @@ main (int argc, char *argv[])
 
 		if (!strcmp(res, "")) {
 			printf("requested index.html\n");
+			sprintf(res, "index.html");
+		}
+		for (c = 0 ; c < dpc ; c++) {
+			if (!strcmp(res, dp[c]->key)) {
+				printf("requested resource is \"%s\"\n", dp[c]->key);
+				break;
+			}
+		}
+		if (c == dpc) {
 			c = 0;
-		} else {
-			for (c = 0 ; c < dpc ; c++) {
-				if (!strcmp(res, dp[c]->key)) {
-					printf("requested resource is \"%s\"\n", dp[c]->key);
-					break;
-				}
-			}
-			if (c == dpc) {
-				c = 0;
-			}
 		}
 
 		if (!strcmp(dp[c]->type, "html")) {

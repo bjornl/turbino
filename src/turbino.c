@@ -38,18 +38,21 @@ main (int argc, char *argv[])
 	char res[256];
 	unsigned int dpc;
 
-	dp = malloc(sizeof(struct data *));
+	dp = malloc(sizeof(struct data *) * 6);
 	dp[0] = load("index.html");
 	dp[1] = load("dummy.jpeg");
 	dp[2] = load("openbsd.jpg");
-	dpc = 3;
+	dp[3] = load("index2.html");
+	dp[4] = load("c228da4b01c870892e560b42320704bd21c9c187.jpg");
+	dp[5] = load("favicon.ico");
+	dpc = 6;
 
 	printf("dp[0] len: %d\n", dp[0]->len);
 	printf("dp[0] key: \"%s\"\n", dp[0]->key);
+	printf("dp[0] type: \"%s\"\n", dp[0]->type);
 	printf("dp[1] len: %d\n", dp[1]->len);
 	printf("dp[1] key: \"%s\"\n", dp[1]->key);
-	printf("dp[2] len: %d\n", dp[2]->len);
-	printf("dp[2] key: \"%s\"\n", dp[2]->key);
+	printf("dp[1] type: \"%s\"\n", dp[1]->type);
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -307,10 +310,11 @@ main (int argc, char *argv[])
 			}
 		}
 
-		/* Fix: file type lookup based on file suffix */
-		if (c == 0) {
+		if (!strcmp(dp[c]->type, "html")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
-		} else {
+		} else if (!strcmp(dp[c]->type, "jpg")) {
+			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
+		} else if (!strcmp(dp[c]->type, "jpeg")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
 		}
 

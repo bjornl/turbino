@@ -11,7 +11,7 @@
 struct data *
 load(char *file)
 {
-	int fd;
+	int fd, i, j = 0;
 	ssize_t len = 1;
 	char buf[1400];
 	//void *data;
@@ -49,6 +49,14 @@ load(char *file)
 		d->key = malloc(strlen(file) + 1);
 		sprintf(d->key, "%s", file);
 	}
+
+	for (i = strlen(file)-1 ; file[i] != '.' ; i--) {
+		j++;
+	}
+
+	d->type = malloc(j + 1);
+	memcpy(d->type, file+(strlen(file)-j), j);
+	d->type[j] = '\0';
 
 	printf("Loaded %d bytes of data\n", d->len);
 

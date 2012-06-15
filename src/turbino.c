@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "load.h"
-#include "pages.h"
+#include "http.h"
 
 #define SERVER_PORT  12345
 
@@ -36,12 +36,20 @@ main (int argc, char *argv[])
 	struct data **dp;
 	unsigned char c, j;
 	char res[256];
+	unsigned int dpc;
 
 	dp = malloc(sizeof(struct data *));
-	dp[0] = load("dummy.jpeg");
+	dp[0] = load("index.html");
+	dp[1] = load("dummy.jpeg");
+	dp[2] = load("openbsd.jpg");
+	dpc = 3;
 
-	printf("dp len: %d\n", dp[0]->len);
-	printf("dp key: \"%s\"\n", dp[0]->key);
+	printf("dp[0] len: %d\n", dp[0]->len);
+	printf("dp[0] key: \"%s\"\n", dp[0]->key);
+	printf("dp[1] len: %d\n", dp[1]->len);
+	printf("dp[1] key: \"%s\"\n", dp[1]->key);
+	printf("dp[2] len: %d\n", dp[2]->len);
+	printf("dp[2] key: \"%s\"\n", dp[2]->key);
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */
@@ -284,27 +292,44 @@ main (int argc, char *argv[])
 
 		printf("res: \"%s\"\n", res);
 
+		if (!strcmp(res, "")) {
+			printf("requested index.html\n");
+			c = 0;
+		} else {
+			for (c = 0 ; c < dpc ; c++) {
+				if (!strcmp(res, dp[c]->key)) {
+					printf("requested resource is \"%s\"\n", dp[c]->key);
+					break;
+				}
+			}
+			if (c == dpc) {
+				c = 0;
+			}
+		}
 
-		//sprintf(buffer, "%s%zd\r\n\r\n%s", http_resp, strlen(html_index), html_index);
-		sprintf(buffer, "%s5618\r\n\r\n", http_resp);
+		/* Fix: file type lookup based on file suffix */
+		if (c == 0) {
+			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
+		} else {
+			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
+		}
 
-		resp = malloc(strlen(buffer) + 5618);
+		resp = malloc(strlen(buffer) + dp[c]->len);
 
 		memcpy(resp, buffer, strlen(buffer));
 
-		//memcpy(resp+strlen(buffer), img, 5618);
-		memcpy(resp+strlen(buffer), dp[0]->data, 5618);
+		memcpy(resp+strlen(buffer), dp[c]->data, dp[c]->len);
 
 
                   //rc = send(i, buffer, strlen(buffer), 0);
-                  rc = send(i, resp, strlen(buffer)+5618, 0);
+                  rc = send(i, resp, strlen(buffer)+dp[c]->len, 0);
                   if (rc < 0)
                   {
                      perror("  send() failed");
                      close_conn = TRUE;
                      break;
                   } else {
-			printf("Sent %d bytes", rc);
+			printf("Sent %d bytes\n", rc);
 		}
 
 		break;

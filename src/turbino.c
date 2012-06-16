@@ -47,7 +47,7 @@ main (int argc, char *argv[])
 		de = readdir(dir);
 
 		if (de) {
-			if (de->d_type == DT_REG) {
+			if (de->d_type == DT_REG || de->d_type == DT_LNK) {
 				printf("Loading file \"%s\" into dp[%d]\n", de->d_name, dpc);
 				dp = realloc(dp, sizeof(struct data *) * (dpc+1));
 				dp[dpc] = load(de->d_name);
@@ -57,12 +57,14 @@ main (int argc, char *argv[])
 	} while (de);
 	closedir(dir);
 
+	/*
 	printf("dp[0] len: %d\n", dp[0]->len);
 	printf("dp[0] key: \"%s\"\n", dp[0]->key);
 	printf("dp[0] type: \"%s\"\n", dp[0]->type);
 	printf("dp[1] len: %d\n", dp[1]->len);
 	printf("dp[1] key: \"%s\"\n", dp[1]->key);
 	printf("dp[1] type: \"%s\"\n", dp[1]->type);
+	*/
 
    /*************************************************************/
    /* Create an AF_INET stream socket to receive incoming       */

@@ -329,6 +329,10 @@ main (int argc, char *argv[])
 			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "jpeg")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
+		} else if (!strcmp(dp[c]->type, "png")) {
+			sprintf(buffer, "%s%d\r\n\r\n", http_image_png, dp[c]->len);
+		} else if (!strcmp(dp[c]->type, "gif")) {
+			sprintf(buffer, "%s%d\r\n\r\n", http_image_gif, dp[c]->len);
 		}
 
 		resp = malloc(strlen(buffer) + dp[c]->len);

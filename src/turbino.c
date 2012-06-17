@@ -318,6 +318,15 @@ main (int argc, char *argv[])
 			}
 		}
 		if (c == dpc) {
+			sprintf(res, "index.html");
+			for (c = 0 ; c < dpc ; c++) {
+				if (!strcmp(res, dp[c]->key)) {
+					printf("Did not find requested resource, sending \"%s\"\n", dp[c]->key);
+					break;
+				}
+			}
+		}
+		if (c == dpc) {
 			c = 0;
 		}
 

@@ -36,9 +36,9 @@ main (int argc, char *argv[])
 	void *resp;
 	//struct data *dp;
 	struct data **dp;
-	unsigned char c, j;
+	unsigned char j;
 	char res[256];
-	unsigned int dpc = 0;
+	unsigned int c, dpc = 0;
 	DIR *dir;
 	struct dirent *de;
 

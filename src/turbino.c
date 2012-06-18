@@ -9,6 +9,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <arpa/inet.h>
 
 #include "load.h"
 #include "http.h"
@@ -28,7 +29,7 @@ main (int argc, char *argv[])
    int    desc_ready, end_server = FALSE;
    int    close_conn;
    char   buffer[10000];
-   struct sockaddr_in   addr;
+   struct sockaddr_in   addr, caddr;
    struct timeval       timeout;
    //struct fd_set        master_set, working_set;
    fd_set        master_set, working_set;
@@ -41,6 +42,7 @@ main (int argc, char *argv[])
 	unsigned int c, dpc = 0;
 	DIR *dir;
 	struct dirent *de;
+	socklen_t clen;
 
 	dir = opendir(".");
 	do {
@@ -219,7 +221,10 @@ main (int argc, char *argv[])
                   /* failure on accept will cause us to end the */
                   /* server.                                    */
                   /**********************************************/
-                  new_sd = accept(listen_sd, NULL, NULL);
+			memset(&caddr, 0, sizeof(struct sockaddr_in));
+			clen = sizeof(caddr);
+                  // new_sd = accept(listen_sd, NULL, NULL);
+                  new_sd = accept(listen_sd, (struct sockaddr *) &caddr, &clen);
                   if (new_sd < 0)
                   {
                      if (errno != EWOULDBLOCK)
@@ -234,7 +239,7 @@ main (int argc, char *argv[])
                   /* Add the new incoming connection to the     */
                   /* master read set                            */
                   /**********************************************/
-                  printf("  New incoming connection - %d\n", new_sd);
+                  printf("  New incoming connection from %s:%d - %d\n", inet_ntoa(caddr.sin_addr), caddr.sin_port, new_sd);
                   FD_SET(new_sd, &master_set);
                   if (new_sd > max_sd)
                      max_sd = new_sd;

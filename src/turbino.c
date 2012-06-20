@@ -160,7 +160,8 @@ main (int argc, char *argv[])
       /* Call select() and wait 5 minutes for it to complete.   */
       /**********************************************************/
       printf("Waiting on select()...\n");
-      rc = select(max_sd + 1, &working_set, NULL, NULL, &timeout);
+      //rc = select(max_sd + 1, &working_set, NULL, NULL, &timeout);
+      rc = select(max_sd + 1, &working_set, NULL, NULL, NULL);
 
       /**********************************************************/
       /* Check to see if the select call failed.                */

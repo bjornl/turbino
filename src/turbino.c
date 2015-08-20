@@ -30,13 +30,13 @@ main (int argc, char *argv[])
    int    close_conn;
    char   buffer[10000];
    struct sockaddr_in   addr, caddr;
-   struct timeval       timeout;
+   //struct timeval       timeout;
    //struct fd_set        master_set, working_set;
    fd_set        master_set, working_set;
 	//void *img;
 	void *resp;
 	//struct data *dp;
-	struct data **dp;
+	struct data **dp = NULL;
 	unsigned char j;
 	char res[256];
 	unsigned int c, dpc = 0;
@@ -142,8 +142,8 @@ main (int argc, char *argv[])
    /* Initialize the timeval struct to 3 minutes.  If no        */
    /* activity after 3 minutes this program will end.           */
    /*************************************************************/
-   timeout.tv_sec  = 3 * 60;
-   timeout.tv_usec = 0;
+   //timeout.tv_sec  = 3 * 60;
+   //timeout.tv_usec = 0;
 
    /*************************************************************/
    /* Loop waiting for incoming connects or for incoming data   */

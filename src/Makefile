@@ -1,9 +1,15 @@
+CC = cc
+CFLAGS = -Wall -O0 -g
+OBJECTS = main.o load.o
 TARGETS = turbino
 
 all: $(TARGETS)
 
-turbino:
-	gcc -Wall -g turbino.c load.c -o turbino
+turbino: $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $@
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) $(OBJECTS)
+
+run:
+	cd html && ../$(TARGETS)

@@ -43,6 +43,17 @@ main (int argc, char *argv[])
 	DIR *dir;
 	struct dirent *de;
 	socklen_t clen;
+	struct data *d;
+
+	/* we store a static not-found page at index slot 0 */
+	dp = realloc(dp, sizeof(struct data *) * (dpc+1));
+	d = malloc(sizeof(struct data));
+	d->data = strdup("Page not found");
+	d->len = strlen(d->data);
+	d->key = strdup("notfound");
+	d->type = strdup("html");
+	dp[dpc] = d;
+	dpc++;
 
 	dir = opendir(".");
 	do {
@@ -318,14 +329,16 @@ main (int argc, char *argv[])
 			sprintf(res, "index.html");
 		}
 		for (c = 0 ; c < dpc ; c++) {
+			printf("checking if key \"%s\" is equal to resource \"%s\"\n", dp[c]->key, res);
 			if (!strcmp(res, dp[c]->key)) {
 				printf("requested resource is \"%s\"\n", dp[c]->key);
 				break;
 			}
 		}
 		if (c == dpc) {
-			sprintf(res, "index.html");
+			sprintf(res, "notfound");
 			for (c = 0 ; c < dpc ; c++) {
+				printf("checking if key \"%s\" is equal to resource \"%s\"\n", dp[c]->key, res);
 				if (!strcmp(res, dp[c]->key)) {
 					printf("Did not find requested resource, sending \"%s\"\n", dp[c]->key);
 					break;
@@ -336,7 +349,9 @@ main (int argc, char *argv[])
 			c = 0;
 		}
 
-		if (!strcmp(dp[c]->type, "html")) {
+		if (c == 0) {
+			sprintf(buffer, "%s%d\r\n\r\n", http_text_html_notfound, dp[c]->len);
+		} else if (!strcmp(dp[c]->type, "html")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "css")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);

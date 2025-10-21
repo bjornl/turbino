@@ -1,6 +1,11 @@
 html, body {
   border: none;
-  margin: 0;
-  padding: 0;
-  background-color: black;
+  margin: 0px;
+  padding: 0px;
+  background-color: lightblue;
+}
+
+img {
+  height: 200px;
+  width: auto;
 }

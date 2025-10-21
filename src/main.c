@@ -24,7 +24,7 @@ struct data * load (char *);
 int
 main (int argc, char *argv[])
 {
-   int    i, len, rc, on = 1;
+   int    i, len, rc, on = 1, sent;
    int    listen_sd, max_sd, new_sd;
    int    desc_ready, end_server = FALSE;
    int    close_conn;
@@ -354,7 +354,7 @@ main (int argc, char *argv[])
 		} else if (!strcmp(dp[c]->type, "html")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "css")) {
-			sprintf(buffer, "%s%d\r\n\r\n", http_text_html, dp[c]->len);
+			sprintf(buffer, "%s%d\r\n\r\n", http_text_css, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "jpg")) {
 			sprintf(buffer, "%s%d\r\n\r\n", http_image_jpeg, dp[c]->len);
 		} else if (!strcmp(dp[c]->type, "jpeg")) {
@@ -365,15 +365,22 @@ main (int argc, char *argv[])
 			sprintf(buffer, "%s%d\r\n\r\n", http_image_gif, dp[c]->len);
 		}
 
+		printf("header size: %zd bytes\n", strlen(buffer));
+		printf("payload size: %d bytes\n", dp[c]->len);
+		len = strlen(buffer) + dp[c]->len;
+		printf("response size: %d bytes\n", len);
+
 		resp = malloc(strlen(buffer) + dp[c]->len);
 
 		memcpy(resp, buffer, strlen(buffer));
 
 		memcpy(resp+strlen(buffer), dp[c]->data, dp[c]->len);
 
-
+		sent = 0;
+		do {
                   //rc = send(i, buffer, strlen(buffer), 0);
-                  rc = send(i, resp, strlen(buffer)+dp[c]->len, 0);
+                  //rc = send(i, resp, strlen(buffer)+dp[c]->len, 0);
+                  rc = send(i, resp+sent, 4096, 0);
                   if (rc < 0)
                   {
                      perror("  send() failed");
@@ -381,7 +388,11 @@ main (int argc, char *argv[])
                      break;
                   } else {
 			printf("Sent %d bytes\n", rc);
-		}
+			sent += rc;
+			printf("Sent combined %d bytes\n", sent);
+		  }
+		} while (sent < len);
+                close_conn = TRUE;
 
 		break;
                } while (TRUE);
